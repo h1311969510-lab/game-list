@@ -6,58 +6,106 @@
     <title>我的游戏图鉴检索</title>
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --bg-color: #f5f7fa;
+            /* 莫兰迪色系变量定义 */
+            /* 第一行：干枯玫瑰粉 (日式/欧美) */
+            --r1-bg: #f2e6e6; --r1-border: #e2caca; --r1-sel: #c79595; 
+            /* 第二行：豆沙浅绿 (视角设定) */
+            --r2-bg: #e6ece4; --r2-border: #c8d4c4; --r2-sel: #8ba684;
+            /* 第三行：灰雾霾蓝 (游戏玩法) */
+            --r3-bg: #e3ebf0; --r3-border: #c5d4df; --r3-sel: #839bb0;
+            /* 第四行：燕麦浅卡其 (其他附带标签) */
+            --r4-bg: #eee9e0; --r4-border: #d6ccbe; --r4-sel: #b59f84;
+            
+            --bg-color: #fafaf9; /* 整体柔和背景 */
             --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-light: #888888;
+            --text-main: #666666; /* 降低文字对比度，更符合莫兰迪风格 */
+            --text-sel: #ffffff;
+            --disabled-bg: #f9f9f9;
+            --disabled-text: #cccccc;
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1000px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; color: var(--primary-color); margin-bottom: 30px; }
+        h1 { text-align: center; color: #7a8b99; margin-bottom: 30px; font-weight: normal; letter-spacing: 2px; }
         
-        /* 标签区域样式 */
-        .tags-container { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .tags-container h3 { margin-top: 0; font-size: 16px; color: var(--text-light); }
-        .tag { display: inline-block; padding: 8px 16px; margin: 5px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s ease; border: 1px solid #ddd; user-select: none; }
+        /* 标签区域外框 */
+        .tags-container { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.03); margin-bottom: 30px; }
         
-        /* 标签的三种状态 */
-        .tag.available { background-color: #fff; color: var(--text-main); border-color: #ccc; }
-        .tag.available:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        
-        .tag.selected { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); box-shadow: 0 2px 4px rgba(74, 144, 226, 0.4); }
-        
-        .tag.disabled { background-color: #f0f0f0; color: #bbbbbb; border-color: #eeeeee; cursor: not-allowed; opacity: 0.6; }
+        /* 每一行标签的容器 */
+        .tag-row { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed #f0f0f0; }
+        .tag-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .tag-row-title { font-size: 14px; color: #a3a3a3; margin: 0 0 10px 5px; }
+
+        /* 基础标签样式 */
+        .tag { display: inline-block; padding: 6px 16px; margin: 4px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.3s ease; user-select: none; border: 1px solid transparent; color: var(--text-main); letter-spacing: 1px; }
+
+        /* ====== 莫兰迪第一行：地域 ====== */
+        .row1 .tag.available { background: var(--r1-bg); border-color: var(--r1-border); }
+        .row1 .tag.available:hover { border-color: var(--r1-sel); }
+        .row1 .tag.selected { background: var(--r1-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(199,149,149,0.3); }
+
+        /* ====== 莫兰迪第二行：视角 ====== */
+        .row2 .tag.available { background: var(--r2-bg); border-color: var(--r2-border); }
+        .row2 .tag.available:hover { border-color: var(--r2-sel); }
+        .row2 .tag.selected { background: var(--r2-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(139,166,132,0.3); }
+
+        /* ====== 莫兰迪第三行：玩法 ====== */
+        .row3 .tag.available { background: var(--r3-bg); border-color: var(--r3-border); }
+        .row3 .tag.available:hover { border-color: var(--r3-sel); }
+        .row3 .tag.selected { background: var(--r3-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(131,155,176,0.3); }
+
+        /* ====== 莫兰迪第四行：其他 ====== */
+        .row4 .tag.available { background: var(--r4-bg); border-color: var(--r4-border); }
+        .row4 .tag.available:hover { border-color: var(--r4-sel); }
+        .row4 .tag.selected { background: var(--r4-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(181,159,132,0.3); }
+
+        /* 统一失效状态（灰色不可点） */
+        .tag.disabled { background: var(--disabled-bg) !important; color: var(--disabled-text) !important; border-color: #eaeaea !important; cursor: not-allowed; opacity: 0.7; box-shadow: none !important; }
 
         /* 游戏列表样式 */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .game-card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .game-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-        .game-title { font-size: 20px; font-weight: bold; margin: 0 0 10px 0; color: var(--primary-color); }
-        .game-desc { font-size: 14px; color: #666; margin-bottom: 15px; }
-        .game-tags span { display: inline-block; font-size: 12px; background: #e8f0fe; color: #1967d2; padding: 4px 8px; border-radius: 4px; margin: 2px 4px 2px 0; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .game-card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #f9f9f9; }
+        .game-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        .game-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #5c6b77; }
+        .game-desc { font-size: 13px; color: #888; margin-bottom: 15px; line-height: 1.5; }
+        .game-tags span { display: inline-block; font-size: 12px; background: #f2f2f2; color: #888; padding: 4px 10px; border-radius: 12px; margin: 2px 4px 4px 0; }
         
-        #loading { text-align: center; color: var(--text-light); font-size: 18px; padding: 50px; }
+        #loading { text-align: center; color: #999; font-size: 16px; padding: 50px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <h1>我的游戏图鉴检索</h1>
     
-    <div class="tags-container">
-        <h3>根据标签筛选游戏：</h3>
-        <div id="tags-box">
-            <!-- 标签会自动生成在这里 -->
+    <div class="tags-container" style="display: none;" id="main-ui">
+        
+        <div class="tag-row row1">
+            <h4 class="tag-row-title">地域与风格</h4>
+            <div id="box-row1"></div>
+        </div>
+
+        <div class="tag-row row2">
+            <h4 class="tag-row-title">视点设定</h4>
+            <div id="box-row2"></div>
+        </div>
+
+        <div class="tag-row row3">
+            <h4 class="tag-row-title">游戏玩法</h4>
+            <div id="box-row3"></div>
+        </div>
+
+        <div class="tag-row row4">
+            <h4 class="tag-row-title">特殊标签 (人物/题材等)</h4>
+            <div id="box-row4"></div>
         </div>
     </div>
 
-    <div id="loading">正在从谷歌表格读取数据...</div>
+    <div id="loading">正在从云端调取档案...</div>
     <div id="games-container" class="games-grid">
         <!-- 游戏列表会自动生成在这里 -->
     </div>
 
     <script>
         // ==========================================
-        // 请把下面的链接替换成你自己的谷歌表格 CSV 链接！
+        // 你的专属谷歌表格数据链接已经替换完毕！
         // ==========================================
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_XdSbWA8dVHTVxhAdEcAcWVdpkwHPPMD1nJTqWh_CwVO7JPT9y8mcrI1DvY4nPjIYJHFKmqzZMgxE/pub?output=csv';
 
@@ -65,35 +113,47 @@
         let allTags = new Set();
         let selectedTags = [];
 
-        // 初始化：获取数据并解析
+        // 判断标签属于哪一行
+        function getTagRowCategory(tag) {
+            const t = tag.toLowerCase(); // 转小写，防止大小写填错
+            
+            // 第一行：欧美、日式
+            if (['日式', '欧美'].includes(t)) return 1;
+            
+            // 第二行：男主视角、女主视角
+            if (['女主视角', '男主视角', '无主视角'].includes(t)) return 2;
+            
+            // 第三行：玩法类型
+            if (['rpg', 'slg', '卡牌', 'act', 'avg', 'galgame', 'fps', 'moba', '模拟', '养成', '文字'].includes(t)) return 3;
+            
+            // 剩下的所有标签统统去第四行
+            return 4;
+        }
+
         async function init() {
             try {
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 parseCSV(csvText);
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-ui').style.display = 'block'; // 数据加载完再显示UI
                 render();
             } catch (error) {
-                document.getElementById('loading').innerText = '数据加载失败，请检查链接是否正确或网络是否通畅。';
+                document.getElementById('loading').innerText = '数据加载失败。请确认链接正确且处于联网环境。';
                 console.error('Error fetching CSV:', error);
             }
         }
 
-        // 解析 CSV 数据
         function parseCSV(text) {
             const lines = text.trim().split('\n');
-            // 从第二行开始读（跳过表头）
             for (let i = 1; i < lines.length; i++) {
-                // 这个正则能正确切分 CSV，即使格子里有逗号也能应对
                 const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                
                 if (row.length >= 2) {
                     const name = row[0].replace(/^"|"$/g, '').trim();
                     const tagsStr = row[1].replace(/^"|"$/g, '').trim();
                     const desc = row[2] ? row[2].replace(/^"|"$/g, '').trim() : '';
 
                     if (name && tagsStr) {
-                        // 兼容中文和英文逗号，拆分标签并去重去空
                         const tagsList = tagsStr.split(/[,，、]/).map(t => t.trim()).filter(t => t !== '');
                         games.push({ name, tags: tagsList, desc });
                         tagsList.forEach(t => allTags.add(t));
@@ -102,40 +162,43 @@
             }
         }
 
-        // 用户点击标签的处理逻辑
         function toggleTag(tag) {
             if (selectedTags.includes(tag)) {
-                // 如果已经选中了，就取消选中
                 selectedTags = selectedTags.filter(t => t !== tag);
             } else {
-                // 如果没选中，就加入选中列表
                 selectedTags.push(tag);
             }
-            render(); // 重新计算并渲染
+            render(); 
         }
 
-        // 核心渲染与联动逻辑
         function render() {
-            // 1. 求交集：找出符合【所有】已选标签的游戏
+            // 1. 求交集
             const filteredGames = games.filter(game => {
                 return selectedTags.every(st => game.tags.includes(st));
             });
 
-            // 2. 求并集：找出幸存游戏身上附带的所有标签
+            // 2. 求并集
             const availableTags = new Set();
             filteredGames.forEach(game => {
                 game.tags.forEach(t => availableTags.add(t));
             });
 
-            // 3. 渲染标签（高亮选中的、亮起可用的、灰掉不存在的组合）
-            const tagsBox = document.getElementById('tags-box');
-            tagsBox.innerHTML = '';
+            // 3. 清空那4个分类盒子
+            const boxes = {
+                1: document.getElementById('box-row1'),
+                2: document.getElementById('box-row2'),
+                3: document.getElementById('box-row3'),
+                4: document.getElementById('box-row4')
+            };
+            for (let key in boxes) { boxes[key].innerHTML = ''; }
             
-            // 把所有标签按首字母排序一下，方便找
+            // 排个序
             const sortedTags = Array.from(allTags).sort((a, b) => a.localeCompare(b, 'zh'));
 
+            // 4. 分发标签到对应的行
             sortedTags.forEach(tag => {
                 const el = document.createElement('span');
+                const rowNum = getTagRowCategory(tag); // 算一下这个标签去哪行
                 
                 if (selectedTags.includes(tag)) {
                     el.className = 'tag selected';
@@ -145,17 +208,16 @@
                     el.onclick = () => toggleTag(tag);
                 } else {
                     el.className = 'tag disabled';
-                    // 灰掉的按钮没有 onClick 事件，点击无效
                 }
                 
                 el.innerText = tag;
-                tagsBox.appendChild(el);
+                boxes[rowNum].appendChild(el); // 把标签塞进对应的行
             });
 
-            // 4. 渲染过滤后的游戏列表
+            // 5. 渲染游戏列表
             const gamesContainer = document.getElementById('games-container');
             if (filteredGames.length === 0) {
-                gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888;">没有找到符合该组合的游戏哦~</p>';
+                gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #a3a3a3; padding: 40px;">没有找到符合该设定的游戏哦~</p>';
             } else {
                 gamesContainer.innerHTML = filteredGames.map(game => {
                     const tagSpans = game.tags.map(t => `<span>${t}</span>`).join('');
@@ -171,7 +233,6 @@
             }
         }
 
-        // 启动程序
         init();
     </script>
 </body>
