@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的游戏图鉴检索</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-light: #888888;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1000px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: var(--primary-color); margin-bottom: 30px; }
+        
+        /* 标签区域样式 */
+        .tags-container { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .tags-container h3 { margin-top: 0; font-size: 16px; color: var(--text-light); }
+        .tag { display: inline-block; padding: 8px 16px; margin: 5px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s ease; border: 1px solid #ddd; user-select: none; }
+        
+        /* 标签的三种状态 */
+        .tag.available { background-color: #fff; color: var(--text-main); border-color: #ccc; }
+        .tag.available:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .tag.selected { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); box-shadow: 0 2px 4px rgba(74, 144, 226, 0.4); }
+        
+        .tag.disabled { background-color: #f0f0f0; color: #bbbbbb; border-color: #eeeeee; cursor: not-allowed; opacity: 0.6; }
+
+        /* 游戏列表样式 */
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .game-card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .game-title { font-size: 20px; font-weight: bold; margin: 0 0 10px 0; color: var(--primary-color); }
+        .game-desc { font-size: 14px; color: #666; margin-bottom: 15px; }
+        .game-tags span { display: inline-block; font-size: 12px; background: #e8f0fe; color: #1967d2; padding: 4px 8px; border-radius: 4px; margin: 2px 4px 2px 0; }
+        
+        #loading { text-align: center; color: var(--text-light); font-size: 18px; padding: 50px; }
+    </style>
+</head>
+<body>
+
+    <h1>我的游戏图鉴检索</h1>
+    
+    <div class="tags-container">
+        <h3>根据标签筛选游戏：</h3>
+        <div id="tags-box">
+            <!-- 标签会自动生成在这里 -->
+        </div>
+    </div>
+
+    <div id="loading">正在从谷歌表格读取数据...</div>
+    <div id="games-container" class="games-grid">
+        <!-- 游戏列表会自动生成在这里 -->
+    </div>
+
+    <script>
+        // ==========================================
+        // 请把下面的链接替换成你自己的谷歌表格 CSV 链接！
+        // ==========================================
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_XdSbWA8dVHTVxhAdEcAcWVdpkwHPPMD1nJTqWh_CwVO7JPT9y8mcrI1DvY4nPjIYJHFKmqzZMgxE/pub?output=csv';
+
+        let games = [];
+        let allTags = new Set();
+        let selectedTags = [];
+
+        // 初始化：获取数据并解析
+        async function init() {
+            try {
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
+                parseCSV(csvText);
+                document.getElementById('loading').style.display = 'none';
+                render();
+            } catch (error) {
+                document.getElementById('loading').innerText = '数据加载失败，请检查链接是否正确或网络是否通畅。';
+                console.error('Error fetching CSV:', error);
+            }
+        }
+
+        // 解析 CSV 数据
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            // 从第二行开始读（跳过表头）
+            for (let i = 1; i < lines.length; i++) {
+                // 这个正则能正确切分 CSV，即使格子里有逗号也能应对
+                const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                
+                if (row.length >= 2) {
+                    const name = row[0].replace(/^"|"$/g, '').trim();
+                    const tagsStr = row[1].replace(/^"|"$/g, '').trim();
+                    const desc = row[2] ? row[2].replace(/^"|"$/g, '').trim() : '';
+
+                    if (name && tagsStr) {
+                        // 兼容中文和英文逗号，拆分标签并去重去空
+                        const tagsList = tagsStr.split(/[,，、]/).map(t => t.trim()).filter(t => t !== '');
+                        games.push({ name, tags: tagsList, desc });
+                        tagsList.forEach(t => allTags.add(t));
+                    }
+                }
+            }
+        }
+
+        // 用户点击标签的处理逻辑
+        function toggleTag(tag) {
+            if (selectedTags.includes(tag)) {
+                // 如果已经选中了，就取消选中
+                selectedTags = selectedTags.filter(t => t !== tag);
+            } else {
+                // 如果没选中，就加入选中列表
+                selectedTags.push(tag);
+            }
+            render(); // 重新计算并渲染
+        }
+
+        // 核心渲染与联动逻辑
+        function render() {
+            // 1. 求交集：找出符合【所有】已选标签的游戏
+            const filteredGames = games.filter(game => {
+                return selectedTags.every(st => game.tags.includes(st));
+            });
+
+            // 2. 求并集：找出幸存游戏身上附带的所有标签
+            const availableTags = new Set();
+            filteredGames.forEach(game => {
+                game.tags.forEach(t => availableTags.add(t));
+            });
+
+            // 3. 渲染标签（高亮选中的、亮起可用的、灰掉不存在的组合）
+            const tagsBox = document.getElementById('tags-box');
+            tagsBox.innerHTML = '';
+            
+            // 把所有标签按首字母排序一下，方便找
+            const sortedTags = Array.from(allTags).sort((a, b) => a.localeCompare(b, 'zh'));
+
+            sortedTags.forEach(tag => {
+                const el = document.createElement('span');
+                
+                if (selectedTags.includes(tag)) {
+                    el.className = 'tag selected';
+                    el.onclick = () => toggleTag(tag);
+                } else if (availableTags.has(tag)) {
+                    el.className = 'tag available';
+                    el.onclick = () => toggleTag(tag);
+                } else {
+                    el.className = 'tag disabled';
+                    // 灰掉的按钮没有 onClick 事件，点击无效
+                }
+                
+                el.innerText = tag;
+                tagsBox.appendChild(el);
+            });
+
+            // 4. 渲染过滤后的游戏列表
+            const gamesContainer = document.getElementById('games-container');
+            if (filteredGames.length === 0) {
+                gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888;">没有找到符合该组合的游戏哦~</p>';
+            } else {
+                gamesContainer.innerHTML = filteredGames.map(game => {
+                    const tagSpans = game.tags.map(t => `<span>${t}</span>`).join('');
+                    const descHtml = game.desc ? `<p class="game-desc">${game.desc}</p>` : '';
+                    return `
+                        <div class="game-card">
+                            <h3 class="game-title">${game.name}</h3>
+                            ${descHtml}
+                            <div class="game-tags">${tagSpans}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 启动程序
+        init();
+    </script>
+</body>
+</html>
