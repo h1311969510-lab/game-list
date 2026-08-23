@@ -3,117 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的游戏图鉴检索</title>
+    <title>我的游戏图鉴</title>
     <style>
         :root {
-            /* 莫兰迪色系变量定义 */
-            /* 第一行：干枯玫瑰粉 (日式/欧美) */
             --r1-bg: #f2e6e6; --r1-border: #e2caca; --r1-sel: #c79595; 
-            /* 第二行：豆沙浅绿 (视角设定) */
             --r2-bg: #e6ece4; --r2-border: #c8d4c4; --r2-sel: #8ba684;
-            /* 第三行：灰雾霾蓝 (游戏玩法) */
             --r3-bg: #e3ebf0; --r3-border: #c5d4df; --r3-sel: #839bb0;
-            /* 第四行：燕麦浅卡其 (其他附带标签) */
             --r4-bg: #eee9e0; --r4-border: #d6ccbe; --r4-sel: #b59f84;
             
-            --bg-color: #fafaf9; /* 整体柔和背景 */
+            --bg-color: #fafaf9; 
             --card-bg: #ffffff;
-            --text-main: #666666; /* 降低文字对比度，更符合莫兰迪风格 */
+            --text-main: #666666; 
             --text-sel: #ffffff;
             --disabled-bg: #f9f9f9;
             --disabled-text: #cccccc;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1000px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; color: #7a8b99; margin-bottom: 30px; font-weight: normal; letter-spacing: 2px; }
         
-        /* 标签区域外框 */
-        .tags-container { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1100px; margin: 0 auto; padding: 20px; }
         
-        /* 每一行标签的容器 */
-        .tag-row { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed #f0f0f0; }
-        .tag-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .tag-row-title { font-size: 14px; color: #a3a3a3; margin: 0 0 10px 5px; }
+        /* 顶部功能区 */
+        .top-bar { display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 20px; }
+        .lib-btn { background: #fff; color: var(--text-main); border: 1px solid #ddd; border-radius: 20px; padding: 8px 24px; cursor: pointer; font-size: 15px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; }
+        .lib-btn:hover { border-color: var(--r4-sel); color: var(--r4-sel); transform: translateY(-2px); }
 
-        /* 基础标签样式 */
+        /* 标签区域 */
+        .tags-container { background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        .tag-row { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px dashed #f0f0f0; }
+        .tag-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
         .tag { display: inline-block; padding: 6px 16px; margin: 4px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.3s ease; user-select: none; border: 1px solid transparent; color: var(--text-main); letter-spacing: 1px; }
 
-        /* ====== 莫兰迪第一行：地域 ====== */
         .row1 .tag.available { background: var(--r1-bg); border-color: var(--r1-border); }
         .row1 .tag.available:hover { border-color: var(--r1-sel); }
         .row1 .tag.selected { background: var(--r1-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(199,149,149,0.3); }
 
-        /* ====== 莫兰迪第二行：视角 ====== */
         .row2 .tag.available { background: var(--r2-bg); border-color: var(--r2-border); }
         .row2 .tag.available:hover { border-color: var(--r2-sel); }
         .row2 .tag.selected { background: var(--r2-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(139,166,132,0.3); }
 
-        /* ====== 莫兰迪第三行：玩法 ====== */
         .row3 .tag.available { background: var(--r3-bg); border-color: var(--r3-border); }
         .row3 .tag.available:hover { border-color: var(--r3-sel); }
         .row3 .tag.selected { background: var(--r3-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(131,155,176,0.3); }
 
-        /* ====== 莫兰迪第四行：其他 ====== */
         .row4 .tag.available { background: var(--r4-bg); border-color: var(--r4-border); }
         .row4 .tag.available:hover { border-color: var(--r4-sel); }
         .row4 .tag.selected { background: var(--r4-sel); color: var(--text-sel); box-shadow: 0 2px 6px rgba(181,159,132,0.3); }
 
-        /* 统一失效状态（灰色不可点） */
         .tag.disabled { background: var(--disabled-bg) !important; color: var(--disabled-text) !important; border-color: #eaeaea !important; cursor: not-allowed; opacity: 0.7; box-shadow: none !important; }
 
-        /* 游戏列表样式 */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .game-card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #f9f9f9; }
-        .game-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-        .game-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #5c6b77; }
-        .game-desc { font-size: 13px; color: #888; margin-bottom: 15px; line-height: 1.5; }
-        .game-tags span { display: inline-block; font-size: 12px; background: #f2f2f2; color: #888; padding: 4px 10px; border-radius: 12px; margin: 2px 4px 4px 0; }
+        /* 游戏列表卡片 */
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
+        .game-card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; border: 1px solid #f9f9f9; display: flex; flex-direction: row; gap: 18px; align-items: start; position: relative; }
+        .game-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        
+        .card-cover { width: 160px; flex-shrink: 0; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
+        
+        .card-info { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; padding-bottom: 20px; }
+        .game-title { font-size: 17px; font-weight: bold; margin: 0; color: #5c6b77; line-height: 1.3; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .card-tags span { display: inline-block; background: #f2f2f2; color: #888; font-size: 11px; padding: 4px 8px; border-radius: 8px; }
+        
+        .card-likes { position: absolute; bottom: 12px; right: 15px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 4px; }
         
         #loading { text-align: center; color: #999; font-size: 16px; padding: 50px; letter-spacing: 1px; }
+
+        /* ================= 通用弹窗框架 ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-color); border-radius: 16px; width: 100%; max-width: 980px; max-height: 90vh; overflow-y: auto; position: relative; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; transition: color 0.2s; line-height: 1; z-index: 100; }
+        .close-btn:hover { color: #333; }
+
+        /* ================= 1. “我的” 专属弹窗样式 ================= */
+        #profile-modal { z-index: 1000; } 
+        .profile-tabs { display: flex; gap: 30px; border-bottom: 2px solid #eaeaea; margin-bottom: 25px; padding-top: 5px; }
+        .tab-btn { font-size: 18px; font-weight: bold; color: #aaa; padding-bottom: 12px; cursor: pointer; position: relative; transition: color 0.3s; }
+        .tab-btn:hover { color: #777; }
+        .tab-btn.active { color: var(--r4-sel); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--r4-sel); border-radius: 3px; }
+
+        /* ================= 2. 游戏详情弹窗样式 ================= */
+        #game-modal { z-index: 1500; } 
+        
+        .md-header-container { margin-bottom: 25px; padding-right: 30px; }
+        .md-header { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 12px; }
+        .md-header h2 { margin: 0; color: #5c6b77; font-size: 24px; flex-shrink: 0; }
+        .md-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .md-tags span { display: inline-block; font-size: 12px; background: #fff; color: #7a8b99; padding: 5px 12px; border-radius: 15px; border: 1px solid #e0e6ed; }
+        
+        /* 互动按钮组 */
+        .md-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .act-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; border: 1px solid #ddd; background: #fff; color: #666; user-select: none; }
+        .act-btn:hover { background: #f9f9f9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        
+        /* 可取消状态视觉反馈 */
+        .act-like.active { color: #e25555; border-color: #f7d2d2; background: #fff5f5; }
+        .act-like.active:hover { background: #ffebeb; color: #c83c3c; border-color: #f0c2c2; } 
+        
+        .act-fav.active { color: #f5a623; border-color: #fbe6c5; background: #fffdf9; }
+        .act-fav.active:hover { background: #fff6e8; color: #d88e17; }
+
+        .m-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px 30px; }
+        .m-block-1 { grid-column: 1; display: flex; flex-direction: column; gap: 15px; }
+        .m-cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #eee; }
+        
+        .m-scores { background: #fff; padding: 15px 20px; border-radius: 10px; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 10px; }
+        .score-item { display: flex; justify-content: space-between; border-bottom: 1px solid #f5f5f5; padding-bottom: 6px; }
+        .score-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .s-label { color: #888; }
+        .s-val { font-weight: bold; color: var(--r3-sel); }
+
+        .m-cgs { grid-column: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-content: start; justify-items: start; }
+        .m-cgs img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; border: 1px solid #ebebeb; background: #eee; cursor: zoom-in; transition: transform 0.2s, box-shadow 0.2s; }
+        .m-cgs img:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.15); z-index: 10; position: relative; }
+        .empty-cg { width: 100%; aspect-ratio: 16 / 9; background: transparent; }
+
+        .m-review { grid-column: 1 / 3; background: #fff; padding: 20px; border-radius: 10px; font-size: 14.5px; line-height: 1.6; color: #555; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 5px solid var(--r4-sel); margin-top: 5px; }
+
+        /* ================= 手机端适配 ================= */
+        @media (max-width: 768px) {
+            .games-grid { grid-template-columns: 1fr; } 
+            .card-cover { width: 130px; } 
+
+            .modal-content { padding: 20px; }
+            .profile-tabs { gap: 15px; }
+            .tab-btn { font-size: 16px; }
+
+            .md-header-container { margin-bottom: 15px; padding-right: 0; }
+            .md-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
+            
+            .m-layout { display: flex; flex-direction: column; gap: 18px; }
+            .m-block-1 { flex-direction: column; gap: 12px; }
+            .m-cover { width: 100%; }
+            
+            .m-scores { flex-direction: row; justify-content: space-between; padding: 12px; align-items: center; }
+            .score-item { flex-direction: column; align-items: center; border-bottom: none; border-right: 1px solid #f0f0f0; padding-bottom: 0; padding-right: 10px; gap: 4px; flex: 1; }
+            .score-item:last-child { border-right: none; padding-right: 0; }
+
+            .m-review { margin-top: 0; border-left: 4px solid var(--r4-sel); padding: 15px; font-size: 14px; }
+            .m-cgs { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+
+        #lightbox-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; cursor: zoom-out; }
+        #lightbox-overlay.show { display: flex; }
+        #lightbox-img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     </style>
 </head>
 <body>
 
-    <h1>我的游戏图鉴检索</h1>
+    <!-- 顶部按钮 -->
+    <div class="top-bar">
+        <div class="lib-btn" onclick="openProfileModal()">
+            <span>👤</span> <span>我的</span>
+        </div>
+    </div>
     
-    <div class="tags-container" style="display: none;" id="main-ui">
-        
-        <div class="tag-row row1">
-            <h4 class="tag-row-title">地域与风格</h4>
-            <div id="box-row1"></div>
-        </div>
+    <div class="tags-container" id="main-ui" style="display: none;">
+        <div class="tag-row row1" id="box-row1"></div>
+        <div class="tag-row row2" id="box-row2"></div>
+        <div class="tag-row row3" id="box-row3"></div>
+        <div class="tag-row row4" id="box-row4"></div>
+    </div>
 
-        <div class="tag-row row2">
-            <h4 class="tag-row-title">视点设定</h4>
-            <div id="box-row2"></div>
-        </div>
+    <div id="loading">正在连接数据库档案...</div>
+    <div id="games-container" class="games-grid"></div>
 
-        <div class="tag-row row3">
-            <h4 class="tag-row-title">游戏玩法</h4>
-            <div id="box-row3"></div>
-        </div>
-
-        <div class="tag-row row4">
-            <h4 class="tag-row-title">特殊标签 (人物/题材等)</h4>
-            <div id="box-row4"></div>
+    <!-- ================= 1. “我的”专属弹窗 ================= -->
+    <div class="modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeProfileModal(event)">&times;</span>
+            
+            <div class="profile-tabs">
+                <div class="tab-btn active" id="tab-likes" onclick="switchProfileTab('likes')">❤️ 赞过的游戏</div>
+                <div class="tab-btn" id="tab-favs" onclick="switchProfileTab('favs')">⭐ 收藏的游戏</div>
+            </div>
+            
+            <div id="profile-games-container" class="games-grid"></div>
         </div>
     </div>
 
-    <div id="loading">正在从云端调取档案...</div>
-    <div id="games-container" class="games-grid">
-        <!-- 游戏列表会自动生成在这里 -->
+    <!-- ================= 2. 游戏详情弹窗 ================= -->
+    <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal(event)">&times;</span>
+            
+            <div class="md-header-container">
+                <div class="md-header">
+                    <h2 id="md-title"></h2>
+                    <div class="md-tags" id="md-tags"></div>
+                </div>
+                <div class="md-actions">
+                    <div class="act-btn act-like" id="btn-like" onclick="handleLike()">
+                        <span id="icon-like">🤍</span> <span id="txt-like">点赞</span> <span id="txt-like-count">0</span>
+                    </div>
+                    <div class="act-btn act-fav" id="btn-fav" onclick="handleFav()">
+                        <span id="icon-fav">☆</span> <span id="txt-fav">收藏</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="m-layout">
+                <div class="m-block-1">
+                    <img id="md-cover" class="m-cover" src="" alt="封面">
+                    <div class="m-scores">
+                        <div class="score-item"><span class="s-label">剧情</span><span class="s-val" id="md-s1"></span></div>
+                        <div class="score-item"><span class="s-label">游戏性</span><span class="s-val" id="md-s2"></span></div>
+                        <div class="score-item"><span class="s-label">实用性</span><span class="s-val" id="md-s3"></span></div>
+                    </div>
+                </div>
+
+                <div class="m-cgs" id="md-cgs"></div>
+                <div class="m-review" id="md-review"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lightbox-overlay" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="大图">
     </div>
 
     <script>
         // ==========================================
-        // 你的专属谷歌表格数据链接
+        // 配置区：数据接口全替换完毕
         // ==========================================
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_XdSbWA8dVHTVxhAdEcAcWVdpkwHPPMD1nJTqWh_CwVO7JPT9y8mcrI1DvY4nPjIYJHFKmqzZMgxE/pub?output=csv';
+        // 最新的接收取消点赞的接口
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGXlxqX2yHgKfXNfQatcSJ2lmM_tu8VpnbX3KnjbWAn_eLJFuJ-u7kypMmKiqsi9KU/exec';
 
         let games = [];
         let allTags = new Set();
         let selectedTags = [];
+        
+        let currentProfileTab = 'likes'; 
+        let currentGame = null;    
 
-        // 判断标签属于哪一行
         function getTagRowCategory(tag) {
             const t = tag.toLowerCase(); 
             if (['日式', '欧美'].includes(t)) return 1;
@@ -131,39 +256,79 @@
                 document.getElementById('main-ui').style.display = 'block'; 
                 render();
             } catch (error) {
-                document.getElementById('loading').innerText = '数据加载失败。请确认链接正确且处于联网环境。';
-                console.error('Error fetching CSV:', error);
+                document.getElementById('loading').innerText = '数据加载失败。请确认链接正确且网络通畅。';
             }
         }
 
-        // ==========================================
-        // 【已修复】更强大的数据解析逻辑，彻底消灭幽灵引号
-        // ==========================================
         function parseCSV(text) {
             const lines = text.trim().split('\n');
             for (let i = 1; i < lines.length; i++) {
-                // 修复1：先把行末尾隐藏的 \r (回车符) 删掉
                 let cleanLine = lines[i].replace(/\r$/, '');
-                
                 const row = cleanLine.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                
                 if (row.length >= 2) {
-                    const name = row[0].replace(/^"|"$/g, '').trim();
-                    const tagsStr = row[1].replace(/^"|"$/g, '').trim();
-                    const desc = row[2] ? row[2].replace(/^"|"$/g, '').trim() : '';
-
+                    const name = row[0] ? row[0].replace(/^"|"$/g, '').trim() : '';
+                    const tagsStr = row[1] ? row[1].replace(/^"|"$/g, '').trim() : '';
+                    
                     if (name && tagsStr) {
-                        // 修复2：用正则 /["“”]/g 强行扫除所有中英文双引号
-                        const tagsList = tagsStr.split(/[,，、]/).map(t => {
-                            return t.replace(/["“”]/g, '').trim(); 
-                        }).filter(t => t !== '');
+                        const tagsList = tagsStr.split(/[,，、]/).map(t => t.replace(/["“”]/g, '').trim()).filter(t => t !== '');
+                        
+                        const s1 = (row[2] && row[2].trim()) ? row[2].replace(/^"|"$/g, '').trim() : '-';
+                        const s2 = (row[3] && row[3].trim()) ? row[3].replace(/^"|"$/g, '').trim() : '-';
+                        const s3 = (row[4] && row[4].trim()) ? row[4].replace(/^"|"$/g, '').trim() : '-';
+                        
+                        const cover = (row[5] && row[5].trim()) ? row[5].replace(/["“”]/g, '').trim() : '';
+                        const review = (row[6] && row[6].trim()) ? row[6].replace(/^"|"$/g, '').trim() : '';
+                        
+                        let likes = 0;
+                        if (row[7] && !isNaN(row[7].trim())) {
+                            likes = parseInt(row[7].trim());
+                        }
 
-                        games.push({ name, tags: tagsList, desc });
+                        const cgs = [];
+                        let hasAnyCg = false;
+                        for (let j = 0; j < 12; j++) {
+                            let val = '';
+                            if ((8 + j) < row.length && row[8 + j] && row[8 + j].trim()) {
+                                val = row[8 + j].replace(/["“”]/g, '').trim();
+                                hasAnyCg = true;
+                            }
+                            cgs.push(val);
+                        }
+                        if (!hasAnyCg) cgs.length = 0;
+
+                        games.push({ name, tags: tagsList, s1, s2, s3, cover, review, likes, cgs });
                         tagsList.forEach(t => allTags.add(t));
                     }
                 }
             }
         }
 
+        // ================= 通用卡片生成器 =================
+        function createGameCard(game) {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            
+            const coverHtml = game.cover ? `<img class="card-cover" src="${game.cover}" loading="lazy">` : `<div class="card-cover" style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;">无封面</div>`;
+            const tagsHtml = game.tags.map(t => `<span>${t}</span>`).join('');
+            
+            const isLikedLocal = localStorage.getItem('liked_' + game.name);
+            const heartIcon = isLikedLocal ? '❤️' : '🤍';
+            
+            card.innerHTML = `
+                ${coverHtml}
+                <div class="card-info">
+                    <h3 class="game-title">${game.name}</h3>
+                    <div class="card-tags">${tagsHtml}</div>
+                </div>
+                <div class="card-likes">${heartIcon} ${game.likes}</div>
+            `;
+            
+            card.onclick = () => openModal(game);
+            return card;
+        }
+
+        // ================= 主图鉴渲染 =================
         function toggleTag(tag) {
             if (selectedTags.includes(tag)) {
                 selectedTags = selectedTags.filter(t => t !== tag);
@@ -179,9 +344,7 @@
             });
 
             const availableTags = new Set();
-            filteredGames.forEach(game => {
-                game.tags.forEach(t => availableTags.add(t));
-            });
+            filteredGames.forEach(game => game.tags.forEach(t => availableTags.add(t)));
 
             const boxes = {
                 1: document.getElementById('box-row1'),
@@ -192,7 +355,6 @@
             for (let key in boxes) { boxes[key].innerHTML = ''; }
             
             const sortedTags = Array.from(allTags).sort((a, b) => a.localeCompare(b, 'zh'));
-
             sortedTags.forEach(tag => {
                 const el = document.createElement('span');
                 const rowNum = getTagRowCategory(tag); 
@@ -215,18 +377,198 @@
             if (filteredGames.length === 0) {
                 gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #a3a3a3; padding: 40px;">没有找到符合该设定的游戏哦~</p>';
             } else {
-                gamesContainer.innerHTML = filteredGames.map(game => {
-                    const tagSpans = game.tags.map(t => `<span>${t}</span>`).join('');
-                    const descHtml = game.desc ? `<p class="game-desc">${game.desc}</p>` : '';
-                    return `
-                        <div class="game-card">
-                            <h3 class="game-title">${game.name}</h3>
-                            ${descHtml}
-                            <div class="game-tags">${tagSpans}</div>
-                        </div>
-                    `;
-                }).join('');
+                gamesContainer.innerHTML = '';
+                filteredGames.forEach((game) => {
+                    gamesContainer.appendChild(createGameCard(game));
+                });
             }
+        }
+
+        // ================= “我的”专属弹窗逻辑 =================
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            renderProfile();
+        }
+
+        function closeProfileModal(e) {
+            if (e && (e.target.id === 'profile-modal' || e.target.classList.contains('close-btn'))) {
+                document.getElementById('profile-modal').classList.remove('show');
+                if (!document.getElementById('game-modal').classList.contains('show')) {
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+
+        function switchProfileTab(tab) {
+            currentProfileTab = tab;
+            document.getElementById('tab-likes').classList.toggle('active', tab === 'likes');
+            document.getElementById('tab-favs').classList.toggle('active', tab === 'favs');
+            renderProfile();
+        }
+
+        function renderProfile() {
+            const container = document.getElementById('profile-games-container');
+            const filtered = games.filter(g => {
+                if (currentProfileTab === 'likes') return localStorage.getItem('liked_' + g.name);
+                if (currentProfileTab === 'favs') return localStorage.getItem('fav_' + g.name);
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                const emptyText = currentProfileTab === 'likes' ? '你还没有点赞过任何游戏哦~' : '你还没有收藏过任何游戏哦~';
+                container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #aaa; padding: 40px; font-size: 14px;">${emptyText}</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            filtered.forEach(game => {
+                container.appendChild(createGameCard(game));
+            });
+        }
+
+        // ================= 游戏详情弹窗逻辑 =================
+        function openModal(game) {
+            currentGame = game;
+
+            document.getElementById('md-title').innerText = game.name;
+            document.getElementById('md-cover').src = game.cover || '';
+            document.getElementById('md-cover').style.display = game.cover ? 'block' : 'none';
+            
+            document.getElementById('md-s1').innerText = game.s1;
+            document.getElementById('md-s2').innerText = game.s2;
+            document.getElementById('md-s3').innerText = game.s3;
+            document.getElementById('md-tags').innerHTML = game.tags.map(t => `<span>${t}</span>`).join('');
+
+            updateActionButtons();
+
+            const reviewEl = document.getElementById('md-review');
+            if (game.review) {
+                reviewEl.style.display = 'block';
+                reviewEl.innerText = game.review;
+            } else {
+                reviewEl.style.display = 'none';
+            }
+
+            const cgsEl = document.getElementById('md-cgs');
+            if (game.cgs.length > 0) {
+                cgsEl.style.display = 'grid';
+                let cgHtml = '';
+                for (let k = 0; k < 12; k++) {
+                    if (game.cgs[k]) {
+                        cgHtml += `<img src="${game.cgs[k]}" loading="lazy" onclick="openLightbox('${game.cgs[k]}', event)">`;
+                    } else {
+                        cgHtml += `<div class="empty-cg"></div>`;
+                    }
+                }
+                cgsEl.innerHTML = cgHtml;
+            } else {
+                cgsEl.style.display = 'none';
+                cgsEl.innerHTML = '';
+            }
+
+            document.getElementById('game-modal').classList.add('show');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal(e) {
+            if (e && (e.target.id === 'game-modal' || e.target.classList.contains('close-btn'))) {
+                document.getElementById('game-modal').classList.remove('show');
+                if (!document.getElementById('profile-modal').classList.contains('show')) {
+                    document.body.style.overflow = 'auto'; 
+                }
+                currentGame = null;
+            }
+        }
+
+        // ===== 可取消点赞与收藏按钮控制 =====
+        function updateActionButtons() {
+            if (!currentGame) return;
+            const isLiked = localStorage.getItem('liked_' + currentGame.name);
+            const isFav = localStorage.getItem('fav_' + currentGame.name);
+            
+            const btnLike = document.getElementById('btn-like');
+            const txtLike = document.getElementById('txt-like');
+            
+            const btnFav = document.getElementById('btn-fav');
+            const txtFav = document.getElementById('txt-fav');
+
+            if (isLiked) {
+                btnLike.className = 'act-btn act-like active';
+                document.getElementById('icon-like').innerText = '❤️';
+                txtLike.innerText = '已赞';
+            } else {
+                btnLike.className = 'act-btn act-like';
+                document.getElementById('icon-like').innerText = '🤍';
+                txtLike.innerText = '点赞';
+            }
+            document.getElementById('txt-like-count').innerText = currentGame.likes;
+
+            if (isFav) {
+                btnFav.className = 'act-btn act-fav active';
+                document.getElementById('icon-fav').innerText = '⭐';
+                txtFav.innerText = '已收藏';
+            } else {
+                btnFav.className = 'act-btn act-fav';
+                document.getElementById('icon-fav').innerText = '☆';
+                txtFav.innerText = '收藏';
+            }
+        }
+
+        function handleLike() {
+            if (!currentGame) return;
+            const isLiked = localStorage.getItem('liked_' + currentGame.name);
+            
+            let actionStr = 'like';
+            if (isLiked) {
+                // 取消点赞: 本地-1
+                currentGame.likes = Math.max(0, currentGame.likes - 1);
+                localStorage.removeItem('liked_' + currentGame.name);
+                actionStr = 'unlike';
+            } else {
+                // 新增点赞: 本地+1
+                currentGame.likes += 1;
+                localStorage.setItem('liked_' + currentGame.name, 'true');
+            }
+            
+            updateActionButtons();
+            render(); 
+            
+            if (document.getElementById('profile-modal').classList.contains('show')) {
+                renderProfile();
+            }
+
+            // 发送给后台脚本记录，包含是点赞还是取消点赞的指令
+            const url = SCRIPT_URL + '?name=' + encodeURIComponent(currentGame.name) + '&action=' + actionStr;
+            fetch(url, { mode: 'no-cors' }).catch(err => console.log('点赞请求发送中...'));
+        }
+
+        function handleFav() {
+            if (!currentGame) return;
+            const isFav = localStorage.getItem('fav_' + currentGame.name);
+            
+            if (isFav) {
+                localStorage.removeItem('fav_' + currentGame.name); 
+            } else {
+                localStorage.setItem('fav_' + currentGame.name, 'true'); 
+            }
+            updateActionButtons();
+
+            if (document.getElementById('profile-modal').classList.contains('show')) {
+                renderProfile();
+            }
+        }
+
+        // 大图查看器
+        function openLightbox(src, event) {
+            event.stopPropagation();
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-overlay').classList.add('show');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-overlay').classList.remove('show');
+            document.getElementById('lightbox-img').src = ''; 
         }
 
         init();
