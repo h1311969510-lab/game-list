@@ -52,16 +52,23 @@
 
         .tag.disabled { background: var(--disabled-bg) !important; color: var(--disabled-text) !important; border-color: #eaeaea !important; cursor: not-allowed; opacity: 0.7; box-shadow: none !important; }
 
-        /* 游戏列表卡片 */
+        /* ================= 修改 2：游戏列表卡片 (全新网格布局) ================= */
         .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-        .game-card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; border: 1px solid #f9f9f9; display: flex; flex-direction: row; gap: 18px; align-items: start; position: relative; }
+        
+        .game-card { 
+            background: var(--card-bg); padding: 15px 15px 35px 15px; border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; 
+            cursor: pointer; border: 1px solid #f9f9f9; position: relative; 
+            /* 启用高级 Grid 布局 */
+            display: grid; grid-template-columns: 160px 1fr; grid-template-rows: auto 1fr; gap: 8px 18px; 
+        }
         .game-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
         
-        .card-cover { width: 160px; flex-shrink: 0; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
+        .card-cover { grid-column: 1; grid-row: 1 / 3; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
         
-        .card-info { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; padding-bottom: 20px; }
-        .game-title { font-size: 17px; font-weight: bold; margin: 0; color: #5c6b77; line-height: 1.3; }
-        .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .game-title { grid-column: 2; grid-row: 1; font-size: 17px; font-weight: bold; margin: 0; color: #5c6b77; line-height: 1.3; }
+        
+        .card-tags { grid-column: 2; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
         .card-tags span { display: inline-block; background: #f2f2f2; color: #888; font-size: 11px; padding: 4px 8px; border-radius: 8px; }
         
         .card-likes { position: absolute; bottom: 12px; right: 15px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 4px; }
@@ -93,12 +100,10 @@
         .md-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
         .md-tags span { display: inline-block; font-size: 12px; background: #fff; color: #7a8b99; padding: 5px 12px; border-radius: 15px; border: 1px solid #e0e6ed; }
         
-        /* 互动按钮组 */
         .md-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .act-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; border: 1px solid #ddd; background: #fff; color: #666; user-select: none; }
         .act-btn:hover { background: #f9f9f9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
         
-        /* 可取消状态视觉反馈 */
         .act-like.active { color: #e25555; border-color: #f7d2d2; background: #fff5f5; }
         .act-like.active:hover { background: #ffebeb; color: #c83c3c; border-color: #f0c2c2; } 
         
@@ -122,28 +127,54 @@
 
         .m-review { grid-column: 1 / 3; background: #fff; padding: 20px; border-radius: 10px; font-size: 14.5px; line-height: 1.6; color: #555; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 5px solid var(--r4-sel); margin-top: 5px; }
 
-        /* ================= 手机端适配 ================= */
+        /* ================= 📱 手机端深度优化适配 ================= */
         @media (max-width: 768px) {
-            .games-grid { grid-template-columns: 1fr; } 
-            .card-cover { width: 130px; } 
+            body { padding: 12px; } 
+            
+            .top-bar { margin-top: 5px; margin-bottom: 15px; }
+            .lib-btn { font-size: 13px; padding: 6px 16px; }
 
+            .tags-container { padding: 15px; margin-bottom: 20px; }
+            .tag-row { padding-bottom: 10px; margin-bottom: 10px; }
+            .tag { font-size: 11.5px; padding: 4px 10px; margin: 3px; }
+
+            /* ================= 手机端卡片：左图右名，底部铺满标签 ================= */
+            .games-grid { grid-template-columns: 1fr; gap: 15px; } 
+            .game-card { 
+                grid-template-columns: 130px 1fr; /* 左边封面宽130 */
+                gap: 10px 15px; 
+                padding-bottom: 30px; 
+            }
+            .card-cover { grid-column: 1; grid-row: 1; /* 取消跨行，只占第一行左侧 */ }
+            .game-title { grid-column: 2; grid-row: 1; align-self: center; /* 居中对齐封面 */ }
+            .card-tags { grid-column: 1 / 3; grid-row: 2; /* 强行横跨整个卡片底部 */ }
+            
+            .card-tags span { font-size: 10px; padding: 2px 6px; }
+
+            /* 弹窗适配 */
             .modal-content { padding: 20px; }
-            .profile-tabs { gap: 15px; }
-            .tab-btn { font-size: 16px; }
+            .profile-tabs { gap: 15px; margin-bottom: 15px; }
+            .tab-btn { font-size: 15px; }
 
             .md-header-container { margin-bottom: 15px; padding-right: 0; }
-            .md-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
+            .md-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+            .md-tags span { font-size: 11px; padding: 3px 10px; }
             
-            .m-layout { display: flex; flex-direction: column; gap: 18px; }
-            .m-block-1 { flex-direction: column; gap: 12px; }
+            .md-actions { gap: 8px; }
+            .act-btn { font-size: 12px; padding: 6px 14px; }
+
+            /* ================= 手机端详情页排版：评价移到中层 ================= */
+            .m-layout { display: flex; flex-direction: column; gap: 15px; }
+            
+            /* 利用 flex order 进行强行视觉重排 */
+            .m-block-1 { order: 1; flex-direction: column; gap: 12px; }
+            .m-review { order: 2; margin-top: 0; padding: 15px; font-size: 13.5px; border-left: 4px solid var(--r4-sel); }
+            .m-cgs { order: 3; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            
             .m-cover { width: 100%; }
-            
             .m-scores { flex-direction: row; justify-content: space-between; padding: 12px; align-items: center; }
             .score-item { flex-direction: column; align-items: center; border-bottom: none; border-right: 1px solid #f0f0f0; padding-bottom: 0; padding-right: 10px; gap: 4px; flex: 1; }
             .score-item:last-child { border-right: none; padding-right: 0; }
-
-            .m-review { margin-top: 0; border-left: 4px solid var(--r4-sel); padding: 15px; font-size: 14px; }
-            .m-cgs { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
 
         #lightbox-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; cursor: zoom-out; }
@@ -153,7 +184,6 @@
 </head>
 <body>
 
-    <!-- 顶部按钮 -->
     <div class="top-bar">
         <div class="lib-btn" onclick="openProfileModal()">
             <span>👤</span> <span>我的</span>
@@ -170,7 +200,6 @@
     <div id="loading">正在连接数据库档案...</div>
     <div id="games-container" class="games-grid"></div>
 
-    <!-- ================= 1. “我的”专属弹窗 ================= -->
     <div class="modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="close-btn" onclick="closeProfileModal(event)">&times;</span>
@@ -184,7 +213,6 @@
         </div>
     </div>
 
-    <!-- ================= 2. 游戏详情弹窗 ================= -->
     <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="close-btn" onclick="closeModal(event)">&times;</span>
@@ -225,11 +253,7 @@
     </div>
 
     <script>
-        // ==========================================
-        // 配置区：数据接口全替换完毕
-        // ==========================================
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_XdSbWA8dVHTVxhAdEcAcWVdpkwHPPMD1nJTqWh_CwVO7JPT9y8mcrI1DvY4nPjIYJHFKmqzZMgxE/pub?output=csv';
-        // 最新的接收取消点赞的接口
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGXlxqX2yHgKfXNfQatcSJ2lmM_tu8VpnbX3KnjbWAn_eLJFuJ-u7kypMmKiqsi9KU/exec';
 
         let games = [];
@@ -304,7 +328,7 @@
             }
         }
 
-        // ================= 通用卡片生成器 =================
+        // ================= 【重构】生成游戏的通用卡片 HTML =================
         function createGameCard(game) {
             const card = document.createElement('div');
             card.className = 'game-card';
@@ -315,12 +339,11 @@
             const isLikedLocal = localStorage.getItem('liked_' + game.name);
             const heartIcon = isLikedLocal ? '❤️' : '🤍';
             
+            // 剥离了多余的包装 <div>，让 CSS Grid 接管元素的排版分配
             card.innerHTML = `
                 ${coverHtml}
-                <div class="card-info">
-                    <h3 class="game-title">${game.name}</h3>
-                    <div class="card-tags">${tagsHtml}</div>
-                </div>
+                <h3 class="game-title">${game.name}</h3>
+                <div class="card-tags">${tagsHtml}</div>
                 <div class="card-likes">${heartIcon} ${game.likes}</div>
             `;
             
@@ -328,7 +351,6 @@
             return card;
         }
 
-        // ================= 主图鉴渲染 =================
         function toggleTag(tag) {
             if (selectedTags.includes(tag)) {
                 selectedTags = selectedTags.filter(t => t !== tag);
@@ -384,7 +406,6 @@
             }
         }
 
-        // ================= “我的”专属弹窗逻辑 =================
         function openProfileModal() {
             document.getElementById('profile-modal').classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -427,7 +448,6 @@
             });
         }
 
-        // ================= 游戏详情弹窗逻辑 =================
         function openModal(game) {
             currentGame = game;
 
@@ -481,7 +501,6 @@
             }
         }
 
-        // ===== 可取消点赞与收藏按钮控制 =====
         function updateActionButtons() {
             if (!currentGame) return;
             const isLiked = localStorage.getItem('liked_' + currentGame.name);
@@ -521,12 +540,10 @@
             
             let actionStr = 'like';
             if (isLiked) {
-                // 取消点赞: 本地-1
                 currentGame.likes = Math.max(0, currentGame.likes - 1);
                 localStorage.removeItem('liked_' + currentGame.name);
                 actionStr = 'unlike';
             } else {
-                // 新增点赞: 本地+1
                 currentGame.likes += 1;
                 localStorage.setItem('liked_' + currentGame.name, 'true');
             }
@@ -538,7 +555,6 @@
                 renderProfile();
             }
 
-            // 发送给后台脚本记录，包含是点赞还是取消点赞的指令
             const url = SCRIPT_URL + '?name=' + encodeURIComponent(currentGame.name) + '&action=' + actionStr;
             fetch(url, { mode: 'no-cors' }).catch(err => console.log('点赞请求发送中...'));
         }
@@ -559,7 +575,6 @@
             }
         }
 
-        // 大图查看器
         function openLightbox(src, event) {
             event.stopPropagation();
             document.getElementById('lightbox-img').src = src;
