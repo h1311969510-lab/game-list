@@ -53,7 +53,7 @@
         .tag.disabled { background: var(--disabled-bg) !important; color: var(--disabled-text) !important; border-color: #eaeaea !important; cursor: not-allowed; opacity: 0.7; box-shadow: none !important; }
 
         /* ================= 修改 2：游戏列表卡片 (全新网格布局) ================= */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         
         .game-card { 
             background: var(--card-bg); padding: 15px 15px 35px 15px; border-radius: 12px; 
@@ -263,6 +263,22 @@
         let currentProfileTab = 'likes'; 
         let currentGame = null;    
 
+        // ===== 👇 新增：滚动加载的控制变量 =====
+        let currentFilteredGames = []; 
+        let currentlyDisplayed = 0;
+        const ITEMS_PER_PAGE = 12; // 每次滑到底部加载 12 个
+
+        // ===== 👇 新增：数组随机打乱函数 =====
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        let currentProfileTab = 'likes'; 
+        let currentGame = null;    
+
         function getTagRowCategory(tag) {
             const t = tag.toLowerCase(); 
             if (['日式', '欧美'].includes(t)) return 1;
@@ -276,6 +292,10 @@
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 parseCSV(csvText);
+                
+                // 👇 新增这行代码：解析完数据后，立刻把游戏总库随机洗牌！
+                shuffleArray(games);
+
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('main-ui').style.display = 'block'; 
                 render();
@@ -361,12 +381,14 @@
         }
 
         function render() {
-            const filteredGames = games.filter(game => {
+            // 1. 过滤游戏，并存入全局变量
+            currentFilteredGames = games.filter(game => {
                 return selectedTags.every(st => game.tags.includes(st));
             });
 
+            // 2. 求并集更新标签状态
             const availableTags = new Set();
-            filteredGames.forEach(game => game.tags.forEach(t => availableTags.add(t)));
+            currentFilteredGames.forEach(game => game.tags.forEach(t => availableTags.add(t)));
 
             const boxes = {
                 1: document.getElementById('box-row1'),
@@ -390,21 +412,49 @@
                 } else {
                     el.className = 'tag disabled';
                 }
-                
                 el.innerText = tag;
                 boxes[rowNum].appendChild(el);
             });
 
+            // 3. 清空游戏列表，准备重新分批加载
             const gamesContainer = document.getElementById('games-container');
-            if (filteredGames.length === 0) {
+            gamesContainer.innerHTML = '';
+            currentlyDisplayed = 0; // 重置已显示的数量为 0
+
+            if (currentFilteredGames.length === 0) {
                 gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #a3a3a3; padding: 40px;">没有找到符合该设定的游戏哦~</p>';
             } else {
-                gamesContainer.innerHTML = '';
-                filteredGames.forEach((game) => {
-                    gamesContainer.appendChild(createGameCard(game));
-                });
+                // 触发首次加载 (前12个)
+                loadMoreGames();
             }
         }
+
+        // ===== 👇 新增：按批次加载游戏的函数 =====
+        function loadMoreGames() {
+            if (currentlyDisplayed >= currentFilteredGames.length) return; // 如果全部加载完了就停止
+
+            const gamesContainer = document.getElementById('games-container');
+            // 切割出接下来的 12 个游戏
+            const nextBatch = currentFilteredGames.slice(currentlyDisplayed, currentlyDisplayed + ITEMS_PER_PAGE);
+            
+            nextBatch.forEach(game => {
+                gamesContainer.appendChild(createGameCard(game));
+            });
+
+            currentlyDisplayed += nextBatch.length; // 更新已加载的数量
+        }
+
+        // ===== 👇 新增：监听鼠标向下滑动事件 =====
+        window.addEventListener('scroll', () => {
+            // 当页面滑到底部 (距离底部不到 200px 时)
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+                // 确保当前没有打开任何弹窗，才触发加载
+                if (!document.getElementById('game-modal').classList.contains('show') && 
+                    !document.getElementById('profile-modal').classList.contains('show')) {
+                    loadMoreGames();
+                }
+            }
+        });
 
         function openProfileModal() {
             document.getElementById('profile-modal').classList.add('show');
