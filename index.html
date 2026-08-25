@@ -244,7 +244,7 @@
         // 新增 1：滚动分页参数
         let currentFilteredGames = []; 
         let currentlyDisplayed = 0;
-        const ITEMS_PER_PAGE = 12; // 每次滑到底部加载 12 个
+        const ITEMS_PER_PAGE = 18; // 每次滑到底部加载 18 个
 
         // 新增 2：随机打乱函数
         function shuffleArray(array) {
@@ -417,9 +417,15 @@
         }
 
         // 新增 6：监听滚动事件
+        // 新增 6：全浏览器兼容的滚动监听事件
         window.addEventListener('scroll', () => {
-            // 滑动到距离底部还剩 200px 的时候触发加载
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+            // 获取兼容所有浏览器的滚动数据
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+            const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+
+            // 距离底部还剩 300px 的时候触发加载 (放宽了触发范围，更灵敏)
+            if (scrollTop + clientHeight >= scrollHeight - 300) {
                 const gameModal = document.getElementById('game-modal');
                 const profileModal = document.getElementById('profile-modal');
                 const lightbox = document.getElementById('lightbox-overlay');
