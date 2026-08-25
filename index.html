@@ -20,14 +20,13 @@
         }
         
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1100px; margin: 0 auto; padding: 20px; }
+        /* 修改 1：总宽度扩大到 1280px */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); max-width: 1280px; margin: 0 auto; padding: 20px; }
         
-        /* 顶部功能区 */
         .top-bar { display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 20px; }
         .lib-btn { background: #fff; color: var(--text-main); border: 1px solid #ddd; border-radius: 20px; padding: 8px 24px; cursor: pointer; font-size: 15px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; }
         .lib-btn:hover { border-color: var(--r4-sel); color: var(--r4-sel); transform: translateY(-2px); }
 
-        /* 标签区域 */
         .tags-container { background: var(--card-bg); padding: 20px 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.03); margin-bottom: 30px; }
         .tag-row { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px dashed #f0f0f0; }
         .tag-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -52,38 +51,31 @@
 
         .tag.disabled { background: var(--disabled-bg) !important; color: var(--disabled-text) !important; border-color: #eaeaea !important; cursor: not-allowed; opacity: 0.7; box-shadow: none !important; }
 
-        /* ================= 修改 2：游戏列表卡片 (全新网格布局) ================= */
+        /* 修改 2：卡片基础尺寸改为 320px，完美排布一行 3 个 */
         .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         
         .game-card { 
             background: var(--card-bg); padding: 15px 15px 35px 15px; border-radius: 12px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s, box-shadow 0.3s; 
             cursor: pointer; border: 1px solid #f9f9f9; position: relative; 
-            /* 启用高级 Grid 布局 */
             display: grid; grid-template-columns: 160px 1fr; grid-template-rows: auto 1fr; gap: 8px 18px; 
         }
         .game-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
         
         .card-cover { grid-column: 1; grid-row: 1 / 3; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
-        
         .game-title { grid-column: 2; grid-row: 1; font-size: 17px; font-weight: bold; margin: 0; color: #5c6b77; line-height: 1.3; }
-        
         .card-tags { grid-column: 2; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
         .card-tags span { display: inline-block; background: #f2f2f2; color: #888; font-size: 11px; padding: 4px 8px; border-radius: 8px; }
-        
         .card-likes { position: absolute; bottom: 12px; right: 15px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 4px; }
         
         #loading { text-align: center; color: #999; font-size: 16px; padding: 50px; letter-spacing: 1px; }
 
-        /* ================= 通用弹窗框架 ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.show { display: flex; opacity: 1; }
         .modal-content { background: var(--bg-color); border-radius: 16px; width: 100%; max-width: 980px; max-height: 90vh; overflow-y: auto; position: relative; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; transition: color 0.2s; line-height: 1; z-index: 100; }
         .close-btn:hover { color: #333; }
 
-        /* ================= 1. “我的” 专属弹窗样式 ================= */
         #profile-modal { z-index: 1000; } 
         .profile-tabs { display: flex; gap: 30px; border-bottom: 2px solid #eaeaea; margin-bottom: 25px; padding-top: 5px; }
         .tab-btn { font-size: 18px; font-weight: bold; color: #aaa; padding-bottom: 12px; cursor: pointer; position: relative; transition: color 0.3s; }
@@ -91,9 +83,7 @@
         .tab-btn.active { color: var(--r4-sel); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--r4-sel); border-radius: 3px; }
 
-        /* ================= 2. 游戏详情弹窗样式 ================= */
         #game-modal { z-index: 1500; } 
-        
         .md-header-container { margin-bottom: 25px; padding-right: 30px; }
         .md-header { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 12px; }
         .md-header h2 { margin: 0; color: #5c6b77; font-size: 24px; flex-shrink: 0; }
@@ -103,17 +93,14 @@
         .md-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .act-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; border: 1px solid #ddd; background: #fff; color: #666; user-select: none; }
         .act-btn:hover { background: #f9f9f9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-        
         .act-like.active { color: #e25555; border-color: #f7d2d2; background: #fff5f5; }
         .act-like.active:hover { background: #ffebeb; color: #c83c3c; border-color: #f0c2c2; } 
-        
         .act-fav.active { color: #f5a623; border-color: #fbe6c5; background: #fffdf9; }
         .act-fav.active:hover { background: #fff6e8; color: #d88e17; }
 
         .m-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px 30px; }
         .m-block-1 { grid-column: 1; display: flex; flex-direction: column; gap: 15px; }
         .m-cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #eee; }
-        
         .m-scores { background: #fff; padding: 15px 20px; border-radius: 10px; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 10px; }
         .score-item { display: flex; justify-content: space-between; border-bottom: 1px solid #f5f5f5; padding-bottom: 6px; }
         .score-item:last-child { border-bottom: none; padding-bottom: 0; }
@@ -124,13 +111,11 @@
         .m-cgs img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; border: 1px solid #ebebeb; background: #eee; cursor: zoom-in; transition: transform 0.2s, box-shadow 0.2s; }
         .m-cgs img:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.15); z-index: 10; position: relative; }
         .empty-cg { width: 100%; aspect-ratio: 16 / 9; background: transparent; }
-
         .m-review { grid-column: 1 / 3; background: #fff; padding: 20px; border-radius: 10px; font-size: 14.5px; line-height: 1.6; color: #555; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 5px solid var(--r4-sel); margin-top: 5px; }
 
-        /* ================= 📱 手机端深度优化适配 ================= */
+        /* ================= 📱 手机端适配 ================= */
         @media (max-width: 768px) {
             body { padding: 12px; } 
-            
             .top-bar { margin-top: 5px; margin-bottom: 15px; }
             .lib-btn { font-size: 13px; padding: 6px 16px; }
 
@@ -138,20 +123,16 @@
             .tag-row { padding-bottom: 10px; margin-bottom: 10px; }
             .tag { font-size: 11.5px; padding: 4px 10px; margin: 3px; }
 
-            /* ================= 手机端卡片：左图右名，底部铺满标签 ================= */
             .games-grid { grid-template-columns: 1fr; gap: 15px; } 
-            .game-card { 
-                grid-template-columns: 130px 1fr; /* 左边封面宽130 */
-                gap: 10px 15px; 
-                padding-bottom: 30px; 
-            }
-            .card-cover { grid-column: 1; grid-row: 1; /* 取消跨行，只占第一行左侧 */ }
-            .game-title { grid-column: 2; grid-row: 1; align-self: start; margin-top: 5px; }
-            .card-tags { grid-column: 1 / 3; grid-row: 2; /* 强行横跨整个卡片底部 */ }
+            .game-card { grid-template-columns: 130px 1fr; gap: 10px 15px; padding-bottom: 30px; }
+            .card-cover { grid-column: 1; grid-row: 1; }
             
+            /* 修改 3：手机端名字强行靠上对齐，加了 5px 边距防贴死 */
+            .game-title { grid-column: 2; grid-row: 1; align-self: start; margin-top: 5px; }
+            
+            .card-tags { grid-column: 1 / 3; grid-row: 2; }
             .card-tags span { font-size: 10px; padding: 2px 6px; }
 
-            /* 弹窗适配 */
             .modal-content { padding: 20px; }
             .profile-tabs { gap: 15px; margin-bottom: 15px; }
             .tab-btn { font-size: 15px; }
@@ -163,10 +144,8 @@
             .md-actions { gap: 8px; }
             .act-btn { font-size: 12px; padding: 6px 14px; }
 
-            /* ================= 手机端详情页排版：评价移到中层 ================= */
+            /* 评价挪到中层 */
             .m-layout { display: flex; flex-direction: column; gap: 15px; }
-            
-            /* 利用 flex order 进行强行视觉重排 */
             .m-block-1 { order: 1; flex-direction: column; gap: 12px; }
             .m-review { order: 2; margin-top: 0; padding: 15px; font-size: 13.5px; border-left: 4px solid var(--r4-sel); }
             .m-cgs { order: 3; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -259,25 +238,21 @@
         let games = [];
         let allTags = new Set();
         let selectedTags = [];
-        
         let currentProfileTab = 'likes'; 
         let currentGame = null;    
 
-        // ===== 👇 新增：滚动加载的控制变量 =====
+        // 新增 1：滚动分页参数
         let currentFilteredGames = []; 
         let currentlyDisplayed = 0;
         const ITEMS_PER_PAGE = 12; // 每次滑到底部加载 12 个
 
-        // ===== 👇 新增：数组随机打乱函数 =====
+        // 新增 2：随机打乱函数
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
         }
-        
-        let currentProfileTab = 'likes'; 
-        let currentGame = null;    
 
         function getTagRowCategory(tag) {
             const t = tag.toLowerCase(); 
@@ -293,7 +268,7 @@
                 const csvText = await response.text();
                 parseCSV(csvText);
                 
-                // 👇 新增这行代码：解析完数据后，立刻把游戏总库随机洗牌！
+                // 新增 3：解析完数据后，立刻把游戏随机洗牌！
                 shuffleArray(games);
 
                 document.getElementById('loading').style.display = 'none';
@@ -309,18 +284,14 @@
             for (let i = 1; i < lines.length; i++) {
                 let cleanLine = lines[i].replace(/\r$/, '');
                 const row = cleanLine.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                
                 if (row.length >= 2) {
                     const name = row[0] ? row[0].replace(/^"|"$/g, '').trim() : '';
                     const tagsStr = row[1] ? row[1].replace(/^"|"$/g, '').trim() : '';
-                    
                     if (name && tagsStr) {
                         const tagsList = tagsStr.split(/[,，、]/).map(t => t.replace(/["“”]/g, '').trim()).filter(t => t !== '');
-                        
                         const s1 = (row[2] && row[2].trim()) ? row[2].replace(/^"|"$/g, '').trim() : '-';
                         const s2 = (row[3] && row[3].trim()) ? row[3].replace(/^"|"$/g, '').trim() : '-';
                         const s3 = (row[4] && row[4].trim()) ? row[4].replace(/^"|"$/g, '').trim() : '-';
-                        
                         const cover = (row[5] && row[5].trim()) ? row[5].replace(/["“”]/g, '').trim() : '';
                         const review = (row[6] && row[6].trim()) ? row[6].replace(/^"|"$/g, '').trim() : '';
                         
@@ -348,7 +319,6 @@
             }
         }
 
-        // ================= 【重构】生成游戏的通用卡片 HTML =================
         function createGameCard(game) {
             const card = document.createElement('div');
             card.className = 'game-card';
@@ -359,7 +329,6 @@
             const isLikedLocal = localStorage.getItem('liked_' + game.name);
             const heartIcon = isLikedLocal ? '❤️' : '🤍';
             
-            // 剥离了多余的包装 <div>，让 CSS Grid 接管元素的排版分配
             card.innerHTML = `
                 ${coverHtml}
                 <h3 class="game-title">${game.name}</h3>
@@ -377,16 +346,15 @@
             } else {
                 selectedTags.push(tag);
             }
-            render(); 
+            render(); // 点击标签，重置加载
         }
 
-        function render() {
-            // 1. 过滤游戏，并存入全局变量
+        // 修改 4：全新重构的分批渲染机制
+        function render(keepScroll = false) {
             currentFilteredGames = games.filter(game => {
                 return selectedTags.every(st => game.tags.includes(st));
             });
 
-            // 2. 求并集更新标签状态
             const availableTags = new Set();
             currentFilteredGames.forEach(game => game.tags.forEach(t => availableTags.add(t)));
 
@@ -402,7 +370,6 @@
             sortedTags.forEach(tag => {
                 const el = document.createElement('span');
                 const rowNum = getTagRowCategory(tag); 
-                
                 if (selectedTags.includes(tag)) {
                     el.className = 'tag selected';
                     el.onclick = () => toggleTag(tag);
@@ -416,41 +383,49 @@
                 boxes[rowNum].appendChild(el);
             });
 
-            // 3. 清空游戏列表，准备重新分批加载
             const gamesContainer = document.getElementById('games-container');
             gamesContainer.innerHTML = '';
-            currentlyDisplayed = 0; // 重置已显示的数量为 0
+
+            // 如果是内部点赞刷新，维持当前展示的数量，否则重置为 12 个
+            let targetCount = keepScroll ? currentlyDisplayed : ITEMS_PER_PAGE;
+            if (targetCount === 0) targetCount = ITEMS_PER_PAGE;
+            currentlyDisplayed = 0;
 
             if (currentFilteredGames.length === 0) {
                 gamesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #a3a3a3; padding: 40px;">没有找到符合该设定的游戏哦~</p>';
             } else {
-                // 触发首次加载 (前12个)
-                loadMoreGames();
+                // 加载第一批/已有批次
+                const batch = currentFilteredGames.slice(0, targetCount);
+                batch.forEach(game => {
+                    gamesContainer.appendChild(createGameCard(game));
+                });
+                currentlyDisplayed = batch.length;
             }
         }
 
-        // ===== 👇 新增：按批次加载游戏的函数 =====
+        // 新增 5：向下滑动时加载更多数据的函数
         function loadMoreGames() {
-            if (currentlyDisplayed >= currentFilteredGames.length) return; // 如果全部加载完了就停止
+            if (currentlyDisplayed >= currentFilteredGames.length) return; 
 
             const gamesContainer = document.getElementById('games-container');
-            // 切割出接下来的 12 个游戏
             const nextBatch = currentFilteredGames.slice(currentlyDisplayed, currentlyDisplayed + ITEMS_PER_PAGE);
             
             nextBatch.forEach(game => {
                 gamesContainer.appendChild(createGameCard(game));
             });
-
-            currentlyDisplayed += nextBatch.length; // 更新已加载的数量
+            currentlyDisplayed += nextBatch.length; 
         }
 
-        // ===== 👇 新增：监听鼠标向下滑动事件 =====
+        // 新增 6：监听滚动事件
         window.addEventListener('scroll', () => {
-            // 当页面滑到底部 (距离底部不到 200px 时)
+            // 滑动到距离底部还剩 200px 的时候触发加载
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-                // 确保当前没有打开任何弹窗，才触发加载
-                if (!document.getElementById('game-modal').classList.contains('show') && 
-                    !document.getElementById('profile-modal').classList.contains('show')) {
+                const gameModal = document.getElementById('game-modal');
+                const profileModal = document.getElementById('profile-modal');
+                const lightbox = document.getElementById('lightbox-overlay');
+                
+                // 确保没开任何弹窗，才触发主页的列表加载
+                if (!gameModal.classList.contains('show') && !profileModal.classList.contains('show') && !lightbox.classList.contains('show')) {
                     loadMoreGames();
                 }
             }
@@ -500,11 +475,9 @@
 
         function openModal(game) {
             currentGame = game;
-
             document.getElementById('md-title').innerText = game.name;
             document.getElementById('md-cover').src = game.cover || '';
             document.getElementById('md-cover').style.display = game.cover ? 'block' : 'none';
-            
             document.getElementById('md-s1').innerText = game.s1;
             document.getElementById('md-s2').innerText = game.s2;
             document.getElementById('md-s3').innerText = game.s3;
@@ -558,7 +531,6 @@
             
             const btnLike = document.getElementById('btn-like');
             const txtLike = document.getElementById('txt-like');
-            
             const btnFav = document.getElementById('btn-fav');
             const txtFav = document.getElementById('txt-fav');
 
@@ -587,8 +559,8 @@
         function handleLike() {
             if (!currentGame) return;
             const isLiked = localStorage.getItem('liked_' + currentGame.name);
-            
             let actionStr = 'like';
+            
             if (isLiked) {
                 currentGame.likes = Math.max(0, currentGame.likes - 1);
                 localStorage.removeItem('liked_' + currentGame.name);
@@ -599,7 +571,9 @@
             }
             
             updateActionButtons();
-            render(); 
+            
+            // 传 true 代表不折叠当前已滑动出的列表数量
+            render(true); 
             
             if (document.getElementById('profile-modal').classList.contains('show')) {
                 renderProfile();
@@ -612,7 +586,6 @@
         function handleFav() {
             if (!currentGame) return;
             const isFav = localStorage.getItem('fav_' + currentGame.name);
-            
             if (isFav) {
                 localStorage.removeItem('fav_' + currentGame.name); 
             } else {
